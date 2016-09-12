@@ -1,0 +1,7 @@
+*.swp
+faketory_bro-*.gem
+.bundle
+tmp
+bin
+*~
+.DS_Store
