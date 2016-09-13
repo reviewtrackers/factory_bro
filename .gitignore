@@ -1,7 +1,9 @@
 *.swp
-faketory_bro-*.gem
+factory_bro-*.gem
 .bundle
 tmp
 bin
 *~
 .DS_Store
+factories
+build.sh
