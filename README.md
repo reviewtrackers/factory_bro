@@ -2,8 +2,8 @@
 
 ### Getting Started (from a Ruby console):
 1. Connect To Database:
- - `FactoryBro.connect(dbName)`
-2. Create Base Factories
+ - `FactoryBro.connect('dbName')` or `FactoryBro.connect('postgres://USER:PASSWORD@HOST:PORT/DBNAME')`
+2. Create Base Factories (scans db for tables and columns and generates all potential factories with a base method defining columns)
  - `FactoryBro.create_bases`
  
 ### In Practice:
