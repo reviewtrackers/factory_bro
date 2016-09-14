@@ -29,12 +29,10 @@ end
 module Factory
   class States
     def self.base
-      id = Faker::Lorem.characters(32)
-      name = Faker::Address.state
       FactoryBro.generate_data('states' , {
         "factoryData": {
-          "id": id,
-          "name": name,
+          "id": id = Faker::Lorem.characters(32),
+          "name": name = Faker::Address.state,
           "code": Faker::Address.state_abbr,
           "active": Faker::Boolean.boolean,
           "country_id": Faker::Lorem.characters(32),
