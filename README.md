@@ -1,6 +1,6 @@
 # Factory Bro
 
-### Getting Started:
+### Getting Started (from a Ruby console):
 1. Connect To Database:
  - `FactoryBro.connect(dbName)`
 2. Create Base Factories
