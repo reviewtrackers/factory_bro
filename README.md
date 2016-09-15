@@ -5,6 +5,8 @@
  - `FactoryBro.connect('dbName')` or `FactoryBro.connect('postgres://USER:PASSWORD@HOST:PORT/DBNAME')`
 2. Create Base Factories
  - `FactoryBro.create_bases`
+2. Close Connection
+ - `FactoryBro.close`
  
 ### In Practice:
 
