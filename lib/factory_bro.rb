@@ -71,7 +71,7 @@ class FactoryBro
 
   def self.base_factory_content(table)
     "module Factory
-  class #{table.capitalize}
+  class #{table.split('_').map { |word| word.capitalize }.join}
     def self.base
       # remember:
       # to return any needed metadata (i.e. ID)
