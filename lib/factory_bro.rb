@@ -6,7 +6,7 @@ class FactoryBro
   def self.connect(db)
     if db.include? 'postgres://'
       dbData = parse_url(db)
-      conn = PG.connect(  user:     dbData[:user],
+      $conn = PG.connect( user:     dbData[:user],
                           password: dbData[:pw],
                           host:     dbData[:host],
                           port:     dbData[:port],
@@ -16,6 +16,10 @@ class FactoryBro
       # take arguments of user and pw
       $conn = PG.connect( dbname: db)
     end
+  end
+
+  def self.close
+    $conn.finish
   end
 
   def self.create_bases
