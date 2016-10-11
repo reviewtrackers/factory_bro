@@ -22,6 +22,11 @@ class FactoryBro
     $conn.finish
   end
 
+  def self.exec(statement)
+    run = $conn.exec(statement)
+    run.values
+  end
+
   def self.create_bases
     tables = parse_tables
     system 'mkdir', '-p', 'factories' unless File.directory?(Dir.pwd+"/factories")
