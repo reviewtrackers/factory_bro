@@ -3,10 +3,19 @@ require 'faker'
 require 'json'
 
 class FactoryBro
-  def self.connect(db)
+  def self.connect(name, db)
+    unless $conns
+      $conns = {}
+    else
+      $conns.each do |key, conn|
+        if conn.finished?
+          $conns[key] = ''
+        end
+      end
+    end
     if db.include? 'postgres://'
       dbData = parse_url(db)
-      $conn = PG.connect( user:     dbData[:user],
+      $conns[name] = PG.connect( user:     dbData[:user],
                           password: dbData[:pw],
                           host:     dbData[:host],
                           port:     dbData[:port],
@@ -14,35 +23,45 @@ class FactoryBro
                         )
     else
       # take arguments of user and pw
-      $conn = PG.connect( dbname: db)
+      $conns[name] = PG.connect( dbname: db)
     end
   end
 
-  def self.close
-    $conn.finish
+  def self.close(name)
+    $conns[name].finish
+    $conns[name] = ''
   end
 
-  def self.exec(statement)
-    run = $conn.exec(statement)
+  def self.close_all
+    $conns.each do |key, conn|
+      if conn.class == PG::Connection
+        conn.finish
+      end
+    end
+    $conns = nil
+  end
+
+  def self.exec(name, statement)
+    run = $conns[name].exec(statement)
     run.values
   end
 
-  def self.create_bases
-    tables = parse_tables
+  def self.create_bases(name)
+    tables = parse_tables(name)
     system 'mkdir', '-p', 'factories' unless File.directory?(Dir.pwd+"/factories")
     tables.each do |table|
       path = File.join(Dir.pwd, 'factories', "#{table}.rb")
       unless File.exists?(path)
 
-        File.open(path, 'w') {|file| file.write(base_factory_content(table)) }
+        File.open(path, 'w') {|file| file.write(base_factory_content(name, table)) }
         # puts "#{table} factory created at: #{path}"
       end
     end
   end
 
-  def self.generate_data(table, data)
+  def self.generate_data(name, table, data)
     helperData = generate_helper(data[:factoryData])
-    res = $conn.exec("INSERT INTO #{table} (#{helperData[:columns]})
+    res = $conns[name].exec(name, "INSERT INTO #{table} (#{helperData[:columns]})
     VALUES (#{helperData[:values]});")
     data[:meta]
   end
@@ -58,8 +77,8 @@ class FactoryBro
     }
   end
 
-  def self.parse_tables
-    res = $conn.exec("SELECT TABLE_NAME
+  def self.parse_tables(name)
+    res = $conns[name].exec(name, "SELECT TABLE_NAME
                       FROM INFORMATION_SCHEMA.TABLES
                       WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='public'
                       ORDER BY TABLE_NAME;")
@@ -68,20 +87,20 @@ class FactoryBro
 
   def self.parse_columns(table)
     # hash this
-    res = $conn.exec(" SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+    res = $conns[name].exec(name, " SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
                       FROM INFORMATION_SCHEMA.COLUMNS
                       WHERE TABLE_NAME = '#{table}';")
     res.values # as tuple
   end
 
-  def self.base_factory_content(table)
+  def self.base_factory_content(name, table)
     "module Factory
   class #{table.split('_').map { |word| word.capitalize }.join}
     def self.base
       # remember:
       # to return any needed metadata (i.e. ID)
       # run other required bases before running method below
-      FactoryBro.generate_data('#{table}' , #{base_method_helper(table)})
+      FactoryBro.generate_data(#{name}, '#{table}' , #{base_method_helper(table)})
     end
   end
 end

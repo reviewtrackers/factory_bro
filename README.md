@@ -2,15 +2,15 @@
 
 ### Getting Started (from a Ruby console):
 1. Connect To Database:
- - `FactoryBro.connect('dbName')` or `FactoryBro.connect('postgres://USER:PASSWORD@HOST:PORT/DBNAME')`
+ - `FactoryBro.connect('identifier', 'dbName')` or `FactoryBro.connect('identifier', 'postgres://USER:PASSWORD@HOST:PORT/DBNAME')`
 2. Create Base Factories
- - `FactoryBro.create_bases`
+ - `FactoryBro.create_bases('identifier')`
 2. Close Connection
- - `FactoryBro.close`
- 
+ - `FactoryBro.close('identifier')`
+
 ### In Practice:
 
-- `create_bases` produces all the potential factories your test suite will need with a guestimated corresponding Faker method for each column. 
+- `create_bases` produces all the potential factories your test suite will need with a guestimated corresponding Faker method for each column.
  - You can call it later if you add more tables.
  - Editing is required after you generate these samples.
 - You must require the factories created in your test helper similar to something like this:
@@ -31,7 +31,7 @@ end
 module Factory
   class States
     def self.base
-      FactoryBro.generate_data('states' , {
+      FactoryBro.generate_data('identifier', states' , {
         "factoryData": {
           "id": id = Faker::Lorem.characters(32),
           "name": name = Faker::Address.state,
