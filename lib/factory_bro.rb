@@ -61,7 +61,7 @@ class FactoryBro
 
   def self.generate_data(name, table, data)
     helperData = generate_helper(data[:factoryData])
-    res = $conns[name].exec(name, "INSERT INTO #{table} (#{helperData[:columns]})
+    res = $conns[name].exec("INSERT INTO #{table} (#{helperData[:columns]})
     VALUES (#{helperData[:values]});")
     data[:meta]
   end
@@ -78,7 +78,7 @@ class FactoryBro
   end
 
   def self.parse_tables(name)
-    res = $conns[name].exec(name, "SELECT TABLE_NAME
+    res = $conns[name].exec("SELECT TABLE_NAME
                       FROM INFORMATION_SCHEMA.TABLES
                       WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA='public'
                       ORDER BY TABLE_NAME;")
@@ -87,7 +87,7 @@ class FactoryBro
 
   def self.parse_columns(table)
     # hash this
-    res = $conns[name].exec(name, " SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
+    res = $conns[name].exec("SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
                       FROM INFORMATION_SCHEMA.COLUMNS
                       WHERE TABLE_NAME = '#{table}';")
     res.values # as tuple
