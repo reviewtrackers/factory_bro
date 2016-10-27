@@ -85,7 +85,7 @@ class FactoryBro
     res.values.flatten # as array of column names
   end
 
-  def self.parse_columns(table)
+  def self.parse_columns(name, table)
     # hash this
     res = $conns[name].exec("SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH
                       FROM INFORMATION_SCHEMA.COLUMNS
@@ -100,16 +100,16 @@ class FactoryBro
       # remember:
       # to return any needed metadata (i.e. ID)
       # run other required bases before running method below
-      FactoryBro.generate_data(#{name}, '#{table}' , #{base_method_helper(table)})
+      FactoryBro.generate_data('#{name}', '#{table}' , #{base_method_helper(name, table)})
     end
   end
 end
 "
   end
 
-  def self.base_method_helper(table)
+  def self.base_method_helper(name, table)
     data = {}
-    parse_columns(table).each do |column|
+    parse_columns(name, table).each do |column|
       data.merge!(column.first => auto_faker_assignment(column)) # idk if auto faker assignment is helping or a burden?
     end
     JSON.pretty_generate({ "factoryData" => data, "meta"=> {}})
