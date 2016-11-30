@@ -122,7 +122,7 @@ end
       if name.include? 'sign_in_ip'
         return "Faker::Internet.ip_v4_address"
       elsif name == 'email'
-        return "Faker::Internet.safe_email"
+        return "test#{rand(99999)}@example.com"
       else
         return "Faker::Lorem.characters(32)"
       end
