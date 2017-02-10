@@ -69,11 +69,15 @@ class FactoryBro
   private
 
   def self.parse_url(url)
-    { :user     => url.scan(/postgres:..[A-Za-z0-9]+/).first.split('//')[-1],
-      :pw       => url.scan(/:[A-Za-z0-9]+@/).first.gsub(/[^a-zA-Z0-9\-]/,""),
-      :host     => url.scan(/(?<=@)(.*)(?=:)/).first.first,
+    pwData = url.scan(/:[A-Za-z0-9]+@/).first
+    hostData = url.scan(/(?<=@)(.*)(?=:)/).first
+    user = (url.scan(/postgres:..[A-Za-z0-9]+/).first.split('//') - ['localhost', 'postgres:']).first
+
+    { :user     => user,
       :port     => url.scan(/:[0-9]+./).first.split('/').first.gsub(/[^a-zA-Z0-9\-]/,""),
-      :dbname   => url.scan(/.[A-Za-z0-9]+$/).first.gsub(/[^a-zA-Z0-9\-]/,"")
+      :dbname   => url.scan(/.[A-Za-z0-9]+$/).first.gsub(/[^a-zA-Z0-9\-]/,""),
+      :host     => hostData ? hostData.first : 'localhost',
+      :pw       => pwData ? pwData.gsub(/[^a-zA-Z0-9\-]/,"") : nil
     }
   end
 
