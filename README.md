@@ -1,4 +1,5 @@
 # Factory Bro
+[![Gem Version](https://badge.fury.io/rb/factory_bro.svg)](https://badge.fury.io/rb/factory_bro)
 
 ### Getting Started (from a Ruby console):
 1. Connect To Database:
