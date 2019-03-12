@@ -9,8 +9,8 @@ Gem::Specification.new do |s|
   s.files       =  Dir['lib/**/*.rb']
   s.homepage    = 'https://github.com/nvreynolds/factory_bro'
 
-  s.add_dependency("pg", "~> 0.18.4")
-  s.add_dependency("faker", "~> 1.6.6")
+  s.add_dependency("pg", "~> 1.1.4")
+  s.add_dependency("faker", "~> 1.9.3")
 
   s.add_development_dependency("pry", "~> 0.10.4")
 end
