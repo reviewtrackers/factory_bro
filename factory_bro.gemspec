@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = 'factory_bro'
-  s.version     = '0.0.7'
-  s.date        = '2017-02-10'
+  s.version     = '0.0.8'
+  s.date        = '2019-3-13'
   s.summary     = "Factory Bro"
   s.description = "PSQL Parser and Data Generation similar to factory_girl"
   s.authors     = ["Nate Reynolds"]
