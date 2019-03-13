@@ -1,5 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'factory_bro'
+  s.licenses    = ['MIT']
   s.version     = '0.0.8'
   s.date        = '2019-03-13'
   s.summary     = "Factory Bro"
