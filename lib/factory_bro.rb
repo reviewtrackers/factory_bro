@@ -8,28 +8,36 @@ class FactoryBro
       $conns = {}
     else
       $conns.each do |key, conn|
-        if conn.finished?
+        if conn&.finished?
           $conns[key] = ''
         end
       end
     end
+    unless $dbs
+      $dbs = {}
+    end
+    $dbs[name] = db
     if db.include? 'postgres://'
       dbData = parse_url(db)
-      $conns[name] = PG.connect( user:     dbData[:user],
-                          password: dbData[:pw],
-                          host:     dbData[:host],
-                          port:     dbData[:port],
-                          dbname:   dbData[:dbname]
-                        )
+      $conns[name] = safe_connect(name) do
+        PG.connect(
+          user:     dbData[:user],
+          password: dbData[:pw],
+          host:     dbData[:host],
+          port:     dbData[:port],
+          dbname:   dbData[:dbname]
+        )
+      end
     else
       # take arguments of user and pw
-      $conns[name] = PG.connect( dbname: db)
+      $conns[name] = safe_connect { PG.connect(dbname: db) }
     end
   end
 
   def self.close(name)
     $conns[name].finish
     $conns[name] = ''
+    $dbs[name] = ''
   end
 
   def self.close_all
@@ -39,10 +47,12 @@ class FactoryBro
       end
     end
     $conns = nil
+    $dbs = nil
   end
 
   def self.exec(name, statement)
-    run = $conns[name].exec(statement)
+    run = safe_connect(name) { $conns[name].exec(statement) }
+    $try = 0
     run.values
   end
 
@@ -153,5 +163,27 @@ end
       values += ", '#{column.last}'"
     end
     { columns: columns, values: values}
+  end
+
+  def self.safe_connect(name)
+    $try ||= 0
+    max_tries = 4
+    wait = 10
+    success = false
+    result = nil
+    until success
+      begin
+        result = yield
+        success = true
+        result
+      rescue PG::UnableToSend, PG::ConnectionBad => error
+        $try += 1
+        raise error if $try > max_tries
+        puts "FactoryBro error: Failed to connect to #{name}, try ##{$try} to reconnect in #{wait}s"
+        sleep wait
+        connect(name, $dbs[name])
+      end
+    end
+    result
   end
 end
